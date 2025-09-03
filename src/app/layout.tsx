@@ -1,9 +1,12 @@
+"use client";
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./components.css";
 import Navigation from "@/components/Navigation";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { useState } from "react";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -14,11 +17,6 @@ const geistMono = Geist_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
 });
-
-export const metadata: Metadata = {
-  title: "HTML Hub - Instant Microtool Publishing Platform",
-  description: "Create, preview, and share HTML/CSS/JS snippets instantly",
-};
 
 export default function RootLayout({
   children,

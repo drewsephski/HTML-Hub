@@ -1,13 +1,15 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import storage from '@/lib/storage';
 
 // GET /api/tools/[id] - Get a specific tool
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const tool = storage.getTool(params.id);
+    // Resolve the params promise
+    const resolvedParams = await params;
+    const tool = storage.getTool(resolvedParams.id);
     
     if (!tool) {
       return NextResponse.json(

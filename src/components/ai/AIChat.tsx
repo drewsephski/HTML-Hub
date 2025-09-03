@@ -8,6 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 interface Message {
   id: string;
@@ -31,6 +33,7 @@ export default function AIChat({ onCodeGenerated }: { onCodeGenerated: (html: st
   // Set Kimi K2 as the default model
   const [selectedModel, setSelectedModel] = useState(FREE_MODELS[0].id);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  const streamBufferRef = useRef('');
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -39,6 +42,64 @@ export default function AIChat({ onCodeGenerated }: { onCodeGenerated: (html: st
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Function to render message content with syntax highlighting
+  const renderMessageContent = (content: string) => {
+    // Split content into code blocks and regular text
+    const parts = [];
+    let lastIndex = 0;
+    const codeBlockRegex = /```(\w+)?\s*([\s\S]*?)```/g;
+    let match;
+
+    while ((match = codeBlockRegex.exec(content)) !== null) {
+      // Add text before code block
+      if (match.index > lastIndex) {
+        parts.push(
+          <span key={`text-${lastIndex}`}>
+            {content.substring(lastIndex, match.index)}
+          </span>
+        );
+      }
+
+      // Add code block with syntax highlighting
+      const language = match[1] || 'text';
+      const code = match[2];
+      
+      parts.push(
+        <div key={`code-${match.index}`} className="my-2 rounded-lg overflow-hidden">
+          <SyntaxHighlighter 
+            language={language} 
+            style={oneDark}
+            customStyle={{
+              margin: 0,
+              borderRadius: '0.5rem',
+              fontSize: '0.875rem'
+            }}
+          >
+            {code}
+          </SyntaxHighlighter>
+        </div>
+      );
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text
+    if (lastIndex < content.length) {
+      parts.push(
+        <span key={`text-${lastIndex}`}>
+          {content.substring(lastIndex)}
+        </span>
+      );
+    }
+
+    // If no code blocks found, just return the content as text
+    if (parts.length === 0) {
+      return <span>{content}</span>;
+    }
+
+    return parts;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +115,7 @@ export default function AIChat({ onCodeGenerated }: { onCodeGenerated: (html: st
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    streamBufferRef.current = '';
 
     try {
       // Call the AI API with a longer timeout
@@ -80,41 +142,72 @@ export default function AIChat({ onCodeGenerated }: { onCodeGenerated: (html: st
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      // Handle streaming response
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
       
-      // Add AI response
+      if (!reader) {
+        throw new Error('No response body');
+      }
+
+      // Create initial AI message
+      const aiMessageId = Date.now().toString();
       const aiMessage: Message = {
-        id: Date.now().toString(),
+        id: aiMessageId,
         role: 'assistant',
-        content: data.content,
-        model: data.model
+        content: '',
+        model: response.headers.get('X-Model-Used') || FREE_MODELS.find(m => m.id === selectedModel)?.name || 'Unknown'
       };
 
       setMessages(prev => [...prev, aiMessage]);
-      
-      // Show fallback notification if it occurred
-      if (data.fallbackOccurred) {
-        const fallbackMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: `Note: The selected model was unavailable, so I used ${data.model} instead to generate this response.`,
-          model: data.model
-        };
-        setMessages(prev => [...prev, fallbackMessage]);
-      }
-      
-      // If the AI response contains HTML code, pass it to the parent
-      if (data.content.includes('<!DOCTYPE html') || data.content.includes('<html')) {
-        // Extract HTML content from the response
-        const htmlMatch = data.content.match(/```html\s*([\s\S]*?)\s*```/);
-        if (htmlMatch && htmlMatch[1]) {
-          onCodeGenerated(htmlMatch[1]);
-        } else {
-          // If no code block found, check if the entire response is HTML
-          if (data.content.trim().startsWith('<')) {
-            onCodeGenerated(data.content);
+
+      // Read the stream
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) {
+          // Check if fallback occurred
+          const fallbackOccurred = response.headers.get('X-Fallback-Occurred') === 'true';
+          if (fallbackOccurred) {
+            const fallbackMessage: Message = {
+              id: (Date.now() + 1).toString(),
+              role: 'assistant',
+              content: `Note: The selected model was unavailable, so I used ${aiMessage.model} instead to generate this response.`,
+              model: aiMessage.model
+            };
+            setMessages(prev => [...prev, fallbackMessage]);
           }
+          
+          // Process the complete response for code extraction
+          if (streamBufferRef.current.includes('<!DOCTYPE html') || streamBufferRef.current.includes('<html')) {
+            // Extract HTML content from the response
+            const htmlMatch = streamBufferRef.current.match(/```html\s*([\s\S]*?)\s*```/);
+            if (htmlMatch && htmlMatch[1]) {
+              onCodeGenerated(htmlMatch[1]);
+            } else {
+              // If no code block found, check if the entire response is HTML
+              if (streamBufferRef.current.trim().startsWith('<')) {
+                onCodeGenerated(streamBufferRef.current);
+              }
+            }
+          }
+          
+          break;
         }
+
+        // Decode and append the chunk to the message
+        const chunk = decoder.decode(value, { stream: true });
+        streamBufferRef.current += chunk;
+        
+        // Update the message content
+        setMessages(prev => prev.map(msg => 
+          msg.id === aiMessageId 
+            ? { ...msg, content: streamBufferRef.current } 
+            : msg
+        ));
+        
+        // Scroll to bottom to show new content
+        scrollToBottom();
       }
     } catch (error: any) {
       console.error('Error getting AI response:', error);
@@ -162,15 +255,15 @@ export default function AIChat({ onCodeGenerated }: { onCodeGenerated: (html: st
             <div className="max-w-md mx-auto text-left space-y-2 mt-3">
               <div className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span className="text-sm">"Create a responsive navbar with logo and menu"</span>
+                <span className="text-sm">&quot;Create a responsive navbar with logo and menu&quot;</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span className="text-sm">"Make a card with image, title and description"</span>
+                <span className="text-sm">&quot;Make a card with image, title and description&quot;</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span className="text-sm">"Build a contact form with mock validation"</span>
+                <span className="text-sm">&quot;Build a contact form with mock validation&quot;</span>
               </div>
             </div>
           </div>
@@ -201,7 +294,11 @@ export default function AIChat({ onCodeGenerated }: { onCodeGenerated: (html: st
                     {message.role === 'user' ? 'You' : 'AI Assistant'}
                   </span>
                 </div>
-                <div className="ai-message-content whitespace-pre-wrap">{message.content}</div>
+                <div className="ai-message-content whitespace-pre-wrap">
+                  {message.role === 'assistant' 
+                    ? renderMessageContent(message.content) 
+                    : message.content}
+                </div>
                 {message.model && message.role === 'assistant' && (
                   <div className="ai-message-model text-xs mt-3 pt-2 border-t border-primary/20 flex items-center gap-1">
                     <span className="w-2 h-2 bg-green-500 rounded-full"></span>
