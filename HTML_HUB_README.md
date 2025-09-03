@@ -1,300 +1,130 @@
 # 🚀 HTML Hub - Instant Microtool Publishing Platform
 
-## 📋 PRD Summary
+Transform your ideas into live web tools in seconds! HTML Hub is a powerful platform that lets you create, preview, and share HTML/CSS/JavaScript snippets with AI-powered code generation and instant publishing.
 
-**Product**: HTML Hub – The fastest way to turn AI-generated HTML/JS/CSS into live, shareable web tools.
+## 🌟 What is HTML Hub?
 
-**Vision**: Empower creators to instantly publish and share interactive web tools without any setup, hosting, or backend knowledge.
+HTML Hub is designed for developers, designers, educators, and AI enthusiasts who want to quickly turn code snippets into shareable web tools. Whether you're prototyping a UI component, sharing an interactive example, or experimenting with AI-generated code, HTML Hub makes it effortless.
 
-**Target Users**:
+## 🎯 Core Features
 
-- Developers prototyping UI components
-- AI enthusiasts sharing AI-generated tools
-- Educators creating interactive examples
-- Hobbyists building mini web apps
+### 💻 Code Editor & Preview
+- **Multi-tab Editor**: Separate tabs for HTML, CSS, and JavaScript
+- **Real-time Preview**: Instantly see changes in the live preview pane
+- **Syntax Highlighting**: Professional code editing experience with Monaco Editor
+- **Responsive Design**: Works flawlessly on all device sizes
 
-**Core Value Proposition**:
+### 🤖 AI Code Generation
+- **Natural Language to Code**: Describe what you want to build and let AI generate the code
+- **Multiple AI Models**: Choose from 10+ free models including GLM-4.5 Air, Kimi K2, Llama 3.3, and more
+- **Automatic Code Insertion**: Generated code is automatically placed in the correct editor tabs
+- **Model Fallback**: If one model is unavailable, we automatically try others
 
-- ⚡ Instant publishing with one click
-- 🔒 Secure sandboxing for all code
-- 🌐 Public gallery for discovery
-- 🎨 Fun, engaging user experience
-- 🤖 AI-powered code generation
+### ⚡ Instant Publishing
+- **One-click Publishing**: Generate a shareable URL with a single click
+- **Unique Tool IDs**: Each publication gets its own permanent URL
+- **Public Gallery**: Showcase your creations in our community gallery
+- **Easy Sharing**: Copy links or share directly on social media
 
-## 🎯 MVP Core Features
+### 🎨 Enhanced UI/UX
+- **Dark Tech Theme**: Modern dark interface with vibrant accent colors
+- **Glowing Effects**: Visual elements with subtle glowing borders
+- **Smooth Animations**: Polished transitions and micro-interactions
+- **Responsive Layout**: Adapts to any screen size
 
-### Core Functionality
+## 🚀 Getting Started
 
-- [x] **Code Paste & Preview**
-  - Large, syntax-highlighted editor
-  - Live iFrame preview
-  - Support for HTML, CSS, and JavaScript
+### Prerequisites
+- Node.js 18.17 or later
+- npm, yarn, pnpm, or bun package manager
+- An OpenRouter API key (for AI features)
 
-- [x] **Instant Publishing**
-  - One-click URL generation
-  - Automatic code validation
-  - Unique, shareable links
+### Quick Setup
+1. Clone the repository
+2. Install dependencies with `npm install`
+3. Create a `.env.local` file with your OpenRouter API key
+4. Run `npm run dev` and visit `http://localhost:3000`
 
-- [x] **Tool Gallery**
-  - Grid of recent publications
-  - Hover previews
-  - Basic search/filter (Phase 2)
+## 🤖 AI Models
 
-### User Experience
+HTML Hub supports multiple free AI models from OpenRouter:
 
-- [x] **Sandbox Security**
-  - iFrame isolation
-  - Strict CSP policies
-  - Code sanitization
+- **GLM-4.5 Air** - Default model, optimized for code generation
+- **Kimi K2** - Advanced reasoning capabilities
+- **DeepSeek V3.1** - High-performance coding model
+- **Gemini 2.5 Flash** - Google's multimodal model
+- **Llama 3.3 70B** - Meta's powerful language model
+- **Mistral Nemo** - Efficient and capable model
+- **Qwen 2.5 72B** - Alibaba's advanced model
+- **Mistral 7B** - Lightweight but effective model
+- **Llama 3.2 3B** - Compact Meta model
+- **Gemma 2 9B** - Google's efficient model
 
-- [x] **Sharing**
-  - Copy link button
-  - Social media sharing
-  - Embed codes
+The app automatically falls back to alternative models if the primary one is unavailable.
 
-- [x] **Fun Elements**
-  - Playful animations
-  - Success microinteractions
-  - Mascot/character
+## 🛡️ Security Features
 
-- [x] **AI Code Generation**
-  - Natural language to HTML/CSS/JS conversion
-  - Powered by GLM-4.5 Air model via OpenRouter
-  - Real-time code generation and insertion
-  - Fallback models for reliability
+- **iframe Sandboxing**: All code runs in isolated environments
+- **Content Security Policy**: Strict policies to prevent XSS attacks
+- **Code Sanitization**: Automatic cleaning of potentially harmful code
+- **Rate Limiting**: Protection against abuse
 
-- [x] **Enhanced UI/UX**
-  - Modern dark tech theme
-  - Glowing border effects
-  - Smooth animations and transitions
-  - Improved code editor experience
-  - Enhanced AI chat interface
+## 📱 User Interface
+
+### Editor Page
+The main editor page features:
+- Tabbed interface for HTML/CSS/JavaScript
+- Large code editor with syntax highlighting
+- Real-time preview pane
+- AI Code Generator panel
+- Publishing controls
+
+### Gallery Page
+- Grid layout of published tools
+- Hover previews of tools
+- Sorting and filtering options
+- Easy navigation between tools
+
+### Tool View Page
+- Full-screen preview of published tools
+- Code viewing option
+- Sharing controls
+- Creation timestamp
 
 ## 🛠️ Tech Stack
 
-### Frontend
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS, Shadcn UI
+- **Editor**: Monaco Editor
+- **AI**: Vercel AI SDK, OpenRouter API
+- **Deployment**: Vercel
 
-- **Framework**: Next.js 15 (App Router)
-- **UI**: Tailwind CSS + Shadcn UI
-- **State**: React Context + useReducer
-- **Code Editor**: Monaco Editor
-- **Animations**: Framer Motion
-- **AI Integration**: Vercel AI SDK + OpenRouter
+## 📈 Use Cases
 
-### Backend
+- **Prototyping**: Quickly build and test UI components
+- **Education**: Create interactive examples for students
+- **Sharing**: Share code snippets with colleagues or the community
+- **AI Experimentation**: Test different AI models for code generation
+- **Mini Projects**: Build small web apps without setup overhead
 
-- **Hosting**: Vercel
-- **Database**: Supabase (PostgreSQL)
-- **Auth**: NextAuth.js (Phase 2)
-- **Storage**: Vercel Blob Storage
+## 🤝 Contributing
 
-### Security
+We welcome contributions of all kinds! Here's how you can help:
 
-- **Sandboxing**: iframe sandbox attributes
-- **CSP**: Strict Content Security Policy
-- **Rate Limiting**: Vercel Edge Middleware
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-## 📱 Page Flows
+Check out our [contribution guidelines](CONTRIBUTING.md) for more details.
 
-### 1. Home / Editor Page (`/`)
+## 📜 License
 
-```
-┌─────────────────────────────────────┐
-│  +----------------------------+    │
-│  |      HTML Hub Logo         |    │
-│  +----------------------------+    │
-│                                   │
-│  [Tabs: HTML | CSS | JavaScript]  │
-│  +----------------------------+    │
-│  | // Your code here...       |    │
-│  |                            |    │
-│  |                            |    │
-│  +----------------------------+    │
-│                                   │
-│  [Preview] [Publish] [Clear]      │
-│                                   │
-│  +----------------------------+   │
-│  | Live Preview (iFrame)      |   │
-│  |                            |   │
-│  +----------------------------+   │
-│                                   │
-│  [AI Code Generator Panel]        │
-│  +----------------------------+   │
-│  | Chat with AI to generate   |   │
-│  | code. Generated code is    |   │
-│  | automatically inserted.    |   │
-│  +----------------------------+   │
-└─────────────────────────────────────┘
-```
-
-### 2. Tool Page (`/t/[id]`)
-
-```
-┌─────────────────────────────────────┐
-│  +----------------------------+    │
-│  | Tool Title                🔗📋  │
-│  +----------------------------+    │
-│  [Preview] [Code] [Fork]            │
-│  +----------------------------+    │
-│  | Live Tool (iFrame)         |    │
-│  |                            |    │
-│  +----------------------------+    │
-│  Created: [timestamp] by [user]    │
-└─────────────────────────────────────┘
-```
-
-### 3. Gallery Page (`/gallery`)
-
-```
-┌─────────────────────────────────────┐
-│  +------------------------+         │
-│  |    🔍 Search...       |  Sort:  │
-│  +------------------------+  Newest ▼│
-│                                   │
-│  ┌───────┐  ┌───────┐  ┌───────┐  │
-│  │ Tool  │  │ Tool  │  │ Tool  │  │
-│  │ Prev  │  │ Prev  │  │ Prev  │  │
-│  └───────┘  └───────┘  └───────┘  │
-│                                   │
-│  ┌───────┐  ┌───────┐  ┌───────┐  │
-│  │ Tool  │  │ Tool  │  │ Tool  │  │
-│  │ Prev  │  │ Prev  │  │ Prev  │  │
-│  └───────┘  └───────┘  └───────┘  │
-│                                   │
-│  [Load More]                      │
-└─────────────────────────────────────┘
-```
-
-## 📅 5-Day MVP Timeline
-
-### Day 1: Foundation & Setup
-
-- [x] Initialize Next.js 15 project with TypeScript
-- [x] Set up Tailwind CSS and Shadcn UI
-- [x] Configure Vercel deployment
-- [x] Set up Supabase project and database
-- [x] Create basic layout and navigation
-- [x] Implement code editor component
-
-### Day 2: Core Functionality
-
-- [x] Implement iFrame sandbox with CSP
-- [x] Create tabbed editor interface
-- [x] Add live preview functionality
-- [x] Implement basic error handling
-- [x] Add copy/paste functionality
-
-### Day 3: Publishing & Sharing
-
-- [x] Set up database schema for tools
-- [x] Implement save functionality
-- [x] Create unique URL generation
-- [x] Build tool view page
-- [x] Add copy link functionality
-
-### Day 4: Gallery & Discovery
-
-- [x] Create gallery page layout
-- [x] Implement tool cards with previews
-- [x] Add pagination
-- [x] Create search functionality
-- [x] Add sorting options
-
-### Day 5: Polish & Launch
-
-- [x] Add loading states and error boundaries
-- [x] Implement responsive design
-- [x] Add fun microinteractions
-- [x] Set up analytics
-- [x] Deploy to production
-- [x] Add AI code generation feature
-- [x] Enhance UI/UX with dark tech theme
-
-## 🚀 Launch Strategy
-
-### Technical Preparation
-
-- [x] Set up custom domain
-- [x] Configure SSL
-- [x] Implement backup system
-- [x] Set up monitoring
-
-### Marketing & Growth
-
-1. **Content Marketing**
-   - Create tutorial videos
-   - Write blog posts about use cases
-   - Share templates and examples
-
-2. **Community Building**
-   - Launch on Product Hunt
-   - Share on Dev.to and Hashnode
-   - Create Twitter/X threads
-
-3. **Growth Hacks**
-   - Add "Made with HTML Hub" badge
-   - Implement referral system
-   - Create template marketplace (Phase 2)
-
-## 📈 Success Metrics
-
-### Primary KPIs
-
-- Number of tools created
-- Active users
-- Average session duration
-- Shares per tool
-
-### Technical Metrics
-
-- API response time
-- Error rates
-- Uptime
-
-## 🔮 Future Roadmap
-
-### Phase 2 (1-2 months)
-
-- User accounts and profiles
-- Comments and likes
-- Collections and folders
-- GitHub integration
-
-### Phase 3 (3-4 months)
-
-- Teams and collaboration
-- Version history
-- Custom domains
-- API access
-
-## 🛡️ Security & Privacy
-
-### Data Protection
-
-- All pastes encrypted at rest
-- Regular security audits
-- Data retention policy
-
-### User Controls
-
-- Private/public tools
-- Password protection
-- Report/flag system
-
-## 🙋 FAQ
-
-**Q: Is there a file size limit?**
-A: Initial limit of 1MB per tool.
-
-**Q: Can I use external libraries?**
-A: Yes, via CDN links in the HTML head.
-
-**Q: How long do tools stay active?**
-A: Currently indefinite, but may implement cleanup of unused tools in the future.
-
-**Q: How does the AI code generation work?**
-A: We use the GLM-4.5 Air model from OpenRouter to convert your natural language descriptions into clean HTML/CSS/JavaScript code. The generated code is automatically inserted into the editor. If the primary model is unavailable, we automatically fallback to other models like Kimi K2 or GPT-3.5 Turbo.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-*HTML Hub - Where ideas become live tools in seconds!* 🚀
+<p align="center">
+  Made with ❤️ by the HTML Hub Team<br/>
+  Turn your ideas into live tools in seconds!
+</p>
