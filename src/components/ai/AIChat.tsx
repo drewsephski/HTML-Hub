@@ -16,24 +16,19 @@ interface Message {
   model?: string;
 }
 
-// Define the available free models
+// Define the available free models (reliable models only in specified order)
 const FREE_MODELS = [
-  { id: 'z-ai/glm-4.5-air:free', name: 'GLM-4.5 Air' },
   { id: 'moonshotai/kimi-k2:free', name: 'Kimi K2' },
+  { id: 'z-ai/glm-4.5-air:free', name: 'GLM-4.5 Air' },
   { id: 'deepseek/deepseek-chat-v3.1:free', name: 'DeepSeek V3.1' },
-  { id: 'google/gemini-2.5-flash-image-preview:free', name: 'Gemini 2.5 Flash' },
-  { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B' },
-  { id: 'mistralai/mistral-nemo:free', name: 'Mistral Nemo' },
-  { id: 'qwen/qwen-2.5-72b-instruct:free', name: 'Qwen 2.5 72B' },
-  { id: 'mistralai/mistral-7b-instruct:free', name: 'Mistral 7B' },
-  { id: 'meta-llama/llama-3.2-3b-instruct:free', name: 'Llama 3.2 3B' },
-  { id: 'google/gemma-2-9b-it:free', name: 'Gemma 2 9B' }
+  { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B' }
 ];
 
 export default function AIChat({ onCodeGenerated }: { onCodeGenerated: (html: string) => void }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  // Set Kimi K2 as the default model
   const [selectedModel, setSelectedModel] = useState(FREE_MODELS[0].id);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
@@ -63,8 +58,8 @@ export default function AIChat({ onCodeGenerated }: { onCodeGenerated: (html: st
     try {
       // Call the AI API with a longer timeout
       const controller = new AbortController();
-      // Set timeout to 58 seconds (slightly less than backend maxDuration of 55 seconds)
-      const timeoutId = setTimeout(() => controller.abort(), 58000);
+      // Set timeout to 60 seconds (frontend timeout)
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
 
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
@@ -97,6 +92,17 @@ export default function AIChat({ onCodeGenerated }: { onCodeGenerated: (html: st
 
       setMessages(prev => [...prev, aiMessage]);
       
+      // Show fallback notification if it occurred
+      if (data.fallbackOccurred) {
+        const fallbackMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: `Note: The selected model was unavailable, so I used ${data.model} instead to generate this response.`,
+          model: data.model
+        };
+        setMessages(prev => [...prev, fallbackMessage]);
+      }
+      
       // If the AI response contains HTML code, pass it to the parent
       if (data.content.includes('<!DOCTYPE html') || data.content.includes('<html')) {
         // Extract HTML content from the response
@@ -118,6 +124,12 @@ export default function AIChat({ onCodeGenerated }: { onCodeGenerated: (html: st
         errorMessage = 'Request timeout: The AI service is taking longer than expected to respond. This might be due to high demand. Please try again with a simpler request or try a different model.';
       } else if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
         errorMessage = 'Network error: Unable to connect to the AI service. Please check your internet connection and try again.';
+      } else if (error.message && error.message.includes('auth')) {
+        errorMessage = 'Authentication error: Invalid or missing API key.';
+      } else if (error.message && (error.message.includes('timeout') || error.message.includes('aborted'))) {
+        errorMessage = 'Request timeout: The AI service is taking longer than expected to respond. This might be due to high demand. Please try again with a simpler request.';
+      } else if (error.message && error.message.includes('credits')) {
+        errorMessage = 'Insufficient credits: Your OpenRouter account has run out of credits. Please visit https://openrouter.ai/settings/credits to add more credits.';
       } else if (error.message) {
         errorMessage = `Error: ${error.message}`;
       }
@@ -220,18 +232,19 @@ export default function AIChat({ onCodeGenerated }: { onCodeGenerated: (html: st
             </div>
           </div>
         )}
+
         <div ref={messagesEndRef} />
       </div>
       
       <form onSubmit={handleSubmit} className="ai-chat-form flex gap-3 p-4 bg-card border-t border-border rounded-b-lg flex-col sm:flex-row">
         <div className="flex-1 flex flex-col sm:flex-row gap-3">
           <Select value={selectedModel} onValueChange={setSelectedModel} disabled={isLoading}>
-            <SelectTrigger className="ai-chat-model-select w-[200px]">
+            <SelectTrigger className="ai-chat-model-select w-[200px] border border-border bg-background text-foreground focus:ring-ring focus:ring-2 rounded-lg">
               <SelectValue placeholder="Select model" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background border border-border text-foreground rounded-lg">
               {FREE_MODELS.map((model) => (
-                <SelectItem key={model.id} value={model.id}>
+                <SelectItem key={model.id} value={model.id} className="hover:bg-muted focus:bg-muted focus:text-foreground py-2 px-3 rounded-md">
                   {model.name}
                 </SelectItem>
               ))}

@@ -100,7 +100,7 @@ export default function Home() {
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <header className="mb-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             HTML Hub
           </h1>
           <p className="text-foreground/80 mt-3 text-lg">

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function Navigation() {
   const pathname = usePathname();
@@ -27,7 +28,7 @@ export default function Navigation() {
                 className={`${
                   pathname === '/' 
                     ? 'border-b-2 border-primary text-foreground font-medium' 
-                    : 'text-foreground/70 hover:border-foreground/30 hover:text-foreground'
+                    : 'text-foreground/70 hover:border-primary/30 hover:text-foreground'
                 } inline-flex items-center px-1 pt-1 border-b-2 text-sm transition-colors duration-200`}
               >
                 Editor
@@ -37,12 +38,15 @@ export default function Navigation() {
                 className={`${
                   pathname === '/gallery' 
                     ? 'border-b-2 border-primary text-foreground font-medium' 
-                    : 'text-foreground/70 hover:border-foreground/30 hover:text-foreground'
+                    : 'text-foreground/70 hover:border-primary/30 hover:text-foreground'
                 } inline-flex items-center px-1 pt-1 border-b-2 text-sm transition-colors duration-200`}
               >
                 Gallery
               </Link>
             </div>
+          </div>
+          <div className="flex items-center">
+            <ThemeToggle />
           </div>
         </div>
       </div>

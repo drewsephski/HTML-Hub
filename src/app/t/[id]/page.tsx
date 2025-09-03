@@ -63,7 +63,7 @@ export default function ToolPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-foreground mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-foreground/80">Loading tool...</p>
         </div>
       </div>
@@ -76,7 +76,7 @@ export default function ToolPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-foreground">Error</h1>
           <p className="text-foreground/80 mt-2">{error}</p>
-          <a href="/" className="mt-4 inline-block px-4 py-2 bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors">
+          <a href="/" className="mt-4 inline-block px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
             Create Your Own Tool
           </a>
         </div>
@@ -90,7 +90,7 @@ export default function ToolPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-foreground">Tool Not Found</h1>
           <p className="text-foreground/80 mt-2">The tool you're looking for doesn't exist or has been removed.</p>
-          <a href="/" className="mt-4 inline-block px-4 py-2 bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors">
+          <a href="/" className="mt-4 inline-block px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
             Create Your Own Tool
           </a>
         </div>
@@ -110,13 +110,13 @@ export default function ToolPage() {
             <div className="flex gap-2">
               <button
                 onClick={copyLink}
-                className="px-4 py-2 bg-foreground/20 text-foreground rounded-md hover:bg-foreground/30 transition-colors flex items-center"
+                className="px-4 py-2 bg-muted text-foreground rounded-md hover:bg-muted/80 transition-colors flex items-center"
               >
                 {copied ? 'Copied!' : 'Copy Link'}
               </button>
               <a 
                 href="/" 
-                className="px-4 py-2 bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors"
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
               >
                 Create Your Own
               </a>
@@ -124,16 +124,16 @@ export default function ToolPage() {
           </div>
         </header>
 
-        <div className="border-b border-foreground/10 mb-6">
+        <div className="border-b border-border mb-6">
           <nav className="flex">
             <button
-              className={`px-4 py-2 font-medium text-sm ${activeTab === 'preview' ? 'bg-foreground/10 text-foreground border-b-2 border-foreground' : 'text-foreground/70 hover:text-foreground'}`}
+              className={`px-4 py-2 font-medium text-sm ${activeTab === 'preview' ? 'bg-primary/10 text-primary border-b-2 border-primary' : 'text-foreground/70 hover:text-foreground hover:bg-accent/50'}`}
               onClick={() => setActiveTab('preview')}
             >
               Preview
             </button>
             <button
-              className={`px-4 py-2 font-medium text-sm ${activeTab === 'code' ? 'bg-foreground/10 text-foreground border-b-2 border-foreground' : 'text-foreground/70 hover:text-foreground'}`}
+              className={`px-4 py-2 font-medium text-sm ${activeTab === 'code' ? 'bg-primary/10 text-primary border-b-2 border-primary' : 'text-foreground/70 hover:text-foreground hover:bg-accent/50'}`}
               onClick={() => setActiveTab('code')}
             >
               Code
@@ -142,7 +142,7 @@ export default function ToolPage() {
         </div>
 
         {activeTab === 'preview' ? (
-          <div className="bg-background rounded-lg shadow-md overflow-hidden border border-foreground/10">
+          <div className="bg-card rounded-lg shadow-md overflow-hidden border border-border">
             <iframe
               srcDoc={srcDoc}
               title="tool-preview"
@@ -152,29 +152,29 @@ export default function ToolPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-background rounded-lg shadow-md overflow-hidden border border-foreground/10">
-              <div className="border-b border-foreground/10 p-4">
+            <div className="bg-card rounded-lg shadow-md overflow-hidden border border-border">
+              <div className="border-b border-border p-4">
                 <h3 className="font-medium text-foreground">HTML</h3>
               </div>
-              <pre className="p-4 bg-foreground/5 text-sm overflow-auto max-h-96 text-foreground">
+              <pre className="p-4 bg-muted text-sm overflow-auto max-h-96 text-foreground">
                 {tool.html || '// No HTML content'}
               </pre>
             </div>
             
-            <div className="bg-background rounded-lg shadow-md overflow-hidden border border-foreground/10">
-              <div className="border-b border-foreground/10 p-4">
+            <div className="bg-card rounded-lg shadow-md overflow-hidden border border-border">
+              <div className="border-b border-border p-4">
                 <h3 className="font-medium text-foreground">CSS</h3>
               </div>
-              <pre className="p-4 bg-foreground/5 text-sm overflow-auto max-h-96 text-foreground">
+              <pre className="p-4 bg-muted text-sm overflow-auto max-h-96 text-foreground">
                 {tool.css || '// No CSS content'}
               </pre>
             </div>
             
-            <div className="bg-background rounded-lg shadow-md overflow-hidden border border-foreground/10">
-              <div className="border-b border-foreground/10 p-4">
+            <div className="bg-card rounded-lg shadow-md overflow-hidden border border-border">
+              <div className="border-b border-border p-4">
                 <h3 className="font-medium text-foreground">JavaScript</h3>
               </div>
-              <pre className="p-4 bg-foreground/5 text-sm overflow-auto max-h-96 text-foreground">
+              <pre className="p-4 bg-muted text-sm overflow-auto max-h-96 text-foreground">
                 {tool.js || '// No JavaScript content'}
               </pre>
             </div>

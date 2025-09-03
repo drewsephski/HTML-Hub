@@ -2,25 +2,15 @@ import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { generateText } from 'ai';
 import { NextResponse } from 'next/server';
 
-// Allow responses up to 55 seconds (less than frontend timeout)
+// Allow responses up to 55 seconds (slightly less than frontend timeout)
 export const maxDuration = 55;
 
-// List of free models from OpenRouter
+// List of free models from OpenRouter (reliable models only in specified order)
 const FREE_MODELS = [
-  { id: 'z-ai/glm-4.5-air:free', name: 'GLM-4.5 Air' },
   { id: 'moonshotai/kimi-k2:free', name: 'Kimi K2' },
+  { id: 'z-ai/glm-4.5-air:free', name: 'GLM-4.5 Air' },
   { id: 'deepseek/deepseek-chat-v3.1:free', name: 'DeepSeek V3.1' },
-  { id: 'google/gemini-2.5-flash-image-preview:free', name: 'Gemini 2.5 Flash' },
-  { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B' },
-  { id: 'mistralai/mistral-nemo:free', name: 'Mistral Nemo' },
-  { id: 'qwen/qwen-2.5-72b-instruct:free', name: 'Qwen 2.5 72B' },
-  { id: 'mistralai/mistral-7b-instruct:free', name: 'Mistral 7B' },
-  { id: 'meta-llama/llama-3.2-3b-instruct:free', name: 'Llama 3.2 3B' },
-  { id: 'google/gemma-2-9b-it:free', name: 'Gemma 2 9B' },
-  { id: 'qwen/qwen3-coder:free', name: 'Qwen3 Coder' },
-  { id: 'deepseek/deepseek-r1:free', name: 'DeepSeek R1' },
-  { id: 'mistralai/mistral-small-24b-instruct-2501:free', name: 'Mistral Small 3' },
-  { id: 'openai/gpt-oss-20b:free', name: 'GPT OSS 20B' }
+  { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B' }
 ];
 
 async function tryGenerateText(openrouter: any, messages: any[], modelInfo: { id: string, name: string }) {
@@ -34,8 +24,8 @@ async function tryGenerateText(openrouter: any, messages: any[], modelInfo: { id
       // Add parameters to reduce token usage
       maxTokens: 1500, // Limit response length
       temperature: 0.7, // Add some creativity but not too much
-      // Add timeout for individual model requests
-      timeout: 50000 // 50 seconds
+      // Add timeout for individual model requests (50 seconds)
+      timeout: 50000
     });
     
     return {
@@ -99,6 +89,7 @@ Key rules:
 
     let finalResult: any = null;
     let finalModelName: string = '';
+    let fallbackOccurred = false;
     
     // If a specific model is selected, try that first
     if (selectedModelId) {
@@ -108,6 +99,9 @@ Key rules:
         if (result.success) {
           finalResult = result.result;
           finalModelName = result.model;
+        } else {
+          // Fallback occurred
+          fallbackOccurred = true;
         }
       }
     }
@@ -115,13 +109,22 @@ Key rules:
     // If no specific model was selected or it failed, try models in order until one works
     if (!finalResult) {
       for (const modelInfo of FREE_MODELS) {
+        // Skip the selected model if we already tried it
+        if (selectedModelId === modelInfo.id && !fallbackOccurred) {
+          continue;
+        }
+        
         const result = await tryGenerateText(openrouter, fullMessages, modelInfo);
         if (result.success) {
           finalResult = result.result;
           finalModelName = result.model;
+          // Set fallback occurred if we're using a different model than selected
+          if (selectedModelId && selectedModelId !== modelInfo.id) {
+            fallbackOccurred = true;
+          }
           break;
         }
-        // Add a small delay between retry attempts
+        // Add a 1-second delay between retry attempts to prevent rate limiting
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
@@ -137,7 +140,8 @@ Key rules:
 
     return NextResponse.json({ 
       content: finalResult.text,
-      model: finalModelName
+      model: finalModelName,
+      fallbackOccurred: fallbackOccurred
     });
   } catch (error: any) {
     console.error('AI Chat Error:', error);

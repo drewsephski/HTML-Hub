@@ -50,7 +50,7 @@ export default function Gallery() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-foreground mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-foreground/80">Loading tools...</p>
         </div>
       </div>
@@ -63,7 +63,7 @@ export default function Gallery() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-foreground">Error</h1>
           <p className="text-foreground/80 mt-2">{error}</p>
-          <a href="/" className="mt-4 inline-block px-4 py-2 bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors">
+          <a href="/" className="mt-4 inline-block px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
             Create Your Own Tool
           </a>
         </div>
@@ -86,7 +86,7 @@ export default function Gallery() {
               placeholder="Search tools..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 pl-10 border border-foreground/30 rounded-md focus:outline-none focus:ring-2 focus:ring-foreground/50 bg-background text-foreground"
+              className="w-full px-4 py-2 pl-10 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground shadow-sm transition-all duration-200"
             />
             <svg 
               className="absolute left-3 top-2.5 h-5 w-5 text-foreground/50" 
@@ -114,7 +114,7 @@ export default function Gallery() {
             {!searchTerm && (
               <a 
                 href="/" 
-                className="mt-4 inline-block px-4 py-2 bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors"
+                className="mt-4 inline-block px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
               >
                 Create Your First Tool
               </a>
@@ -123,8 +123,8 @@ export default function Gallery() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTools.map((tool) => (
-              <div key={tool.id} className="bg-background rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-foreground/10">
-                <div className="p-4 border-b border-foreground/10">
+              <div key={tool.id} className="bg-card rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-border">
+                <div className="p-4 border-b border-border">
                   <h3 className="font-medium text-foreground truncate">{tool.title}</h3>
                   <p className="text-sm text-foreground/70 mt-1">
                     Created: {new Date(tool.createdAt).toLocaleDateString()}
@@ -134,7 +134,7 @@ export default function Gallery() {
                   <div className="flex justify-between items-center">
                     <a 
                       href={`/t/${tool.id}`} 
-                      className="text-foreground hover:text-foreground/80 font-medium"
+                      className="text-primary hover:text-primary/80 font-medium"
                     >
                       View Tool
                     </a>
