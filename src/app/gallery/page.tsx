@@ -5,11 +5,13 @@ import Link from 'next/link';
  
 interface Tool {
   id: string;
+  userId: string;
   title: string;
   html: string;
   css: string;
   js: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export default function Gallery() {
@@ -17,6 +19,8 @@ export default function Gallery() {
   const [filteredTools, setFilteredTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filter, setFilter] = useState('all'); // all, html, css, js
 
   useEffect(() => {
     const fetchTools = async () => {
@@ -28,8 +32,9 @@ export default function Gallery() {
         }
         
         const data = await response.json();
-        setTools(data.tools);
-        setFilteredTools(data.tools);
+        // The API returns an object with a tools property
+        setTools(data.tools || []);
+        setFilteredTools(data.tools || []);
       } catch (err) {
         setError('Failed to load tools');
         console.error('Error fetching tools:', err);
@@ -40,6 +45,32 @@ export default function Gallery() {
 
     fetchTools();
   }, []);
+
+  useEffect(() => {
+    let result = tools;
+    
+    // Apply search filter
+    if (searchTerm) {
+      result = result.filter(tool => 
+        tool.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tool.html.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tool.css.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tool.js.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    // Apply type filter
+    if (filter !== 'all') {
+      result = result.filter(tool => {
+        if (filter === 'html') return tool.html && tool.html.trim() !== '';
+        if (filter === 'css') return tool.css && tool.css.trim() !== '';
+        if (filter === 'js') return tool.js && tool.js.trim() !== '';
+        return true;
+      });
+    }
+    
+    setFilteredTools(result);
+  }, [searchTerm, filter, tools]);
 
   if (loading) {
     return (
@@ -74,11 +105,69 @@ export default function Gallery() {
           <p className="text-foreground/80 mt-2">Browse and discover HTML/CSS/JS snippets created by the community</p>
         </header>
 
+        {/* Search and Filter Controls */}
+        <div className="mb-8 flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="Search tools..."
+              className="w-full px-4 py-2 border border-border rounded-lg focus-enhanced bg-card text-foreground shadow-sm transition-all duration-200"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              className={`px-4 py-2 rounded-lg transition-colors font-medium ${
+                filter === 'all' 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'bg-muted text-foreground hover:bg-muted/80'
+              }`}
+              onClick={() => setFilter('all')}
+            >
+              All
+            </button>
+            <button
+              className={`px-4 py-2 rounded-lg transition-colors font-medium flex items-center gap-2 ${
+                filter === 'html' 
+                  ? 'bg-red-500/20 text-red-700 dark:text-red-300' 
+                  : 'bg-muted text-foreground hover:bg-muted/80'
+              }`}
+              onClick={() => setFilter('html')}
+            >
+              <span className="w-3 h-3 bg-red-500 rounded-full"></span>
+              HTML
+            </button>
+            <button
+              className={`px-4 py-2 rounded-lg transition-colors font-medium flex items-center gap-2 ${
+                filter === 'css' 
+                  ? 'bg-blue-500/20 text-blue-700 dark:text-blue-300' 
+                  : 'bg-muted text-foreground hover:bg-muted/80'
+              }`}
+              onClick={() => setFilter('css')}
+            >
+              <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
+              CSS
+            </button>
+            <button
+              className={`px-4 py-2 rounded-lg transition-colors font-medium flex items-center gap-2 ${
+                filter === 'js' 
+                  ? 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300' 
+                  : 'bg-muted text-foreground hover:bg-muted/80'
+              }`}
+              onClick={() => setFilter('js')}
+            >
+              <span className="w-3 h-3 bg-yellow-500 rounded-full"></span>
+              JS
+            </button>
+          </div>
+        </div>
+
         {filteredTools.length === 0 ? (
           <div className="text-center py-12">
             <h2 className="text-xl font-medium text-foreground">No tools found</h2>
             <p className="text-foreground/80 mt-2">
-              Be the first to publish a tool!
+              {searchTerm ? 'Try a different search term' : 'Be the first to publish a tool!'}
             </p>
             <Link
               href="/"

@@ -242,29 +242,35 @@ export default function AIChat({ onCodeGenerated }: { onCodeGenerated: (html: st
     <div className="ai-chat-container flex flex-col h-full">
       <div className="ai-chat-messages flex-1 overflow-y-auto p-4 space-y-0 bg-background rounded-lg">
         {messages.length === 0 ? (
-          <div className="text-center text-foreground/70 py-8 rounded-lg bg-card border border-border h-full flex flex-col justify-center">
+          <div className="text-center text-foreground/70 py-4 rounded-lg bg-card border border-border h-full flex flex-col justify-center">
             <div className="mb-2">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                 </svg>
               </div>
-              <h3 className="font-extrabold mb-1 text-3xl text-foreground tracking-tight">Let's Cook</h3>
+              <h3 className="font-extrabold mb-0 text-3xl text-foreground tracking-tight">Let's Cook</h3>
             </div>
             <p className="text-lg mb-1 font-semibold text-foreground/90 tracking-wide">Examples:</p>
-            <div className="max-w-md mx-auto text-left space-y-1 mt-4">
-              <div className="flex items-start gap-3">
-                <span className="text-primary mt-0 text-lg">•</span>
-                <span className="text-base text-foreground leading-relaxed">&quot;Create a responsive navbar with logo and menu&quot;</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-primary mt-0 text-lg">•</span>
-                <span className="text-base text-foreground leading-relaxed">&quot;Make a card with image, title and description&quot;</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-primary mt-0 text-lg">•</span>
-                <span className="text-base text-foreground leading-relaxed mb-6">&quot;Build a contact form with mock validation&quot;</span>
-              </div>
+            <div className="max-w-md mx-auto text-left space-y-3 mt-4">
+              <button
+                onClick={() => setInput("Create a responsive navbar with logo and menu")}
+                className="w-full text-left p-3 rounded-lg bg-card border border-border hover:bg-accent hover:border-primary/30 transition-colors text-base text-foreground leading-relaxed"
+              >
+                "Create a responsive navbar with logo and menu"
+              </button>
+              <button
+                onClick={() => setInput("Make a card with image, title and description")}
+                className="w-full text-left p-3 rounded-lg bg-card border border-border hover:bg-accent hover:border-primary/30 transition-colors text-base text-foreground leading-relaxed"
+              >
+                "Make a card with image, title and description"
+              </button>
+              <button
+                onClick={() => setInput("Build a contact form with mock validation")}
+                className="w-full text-left p-3 rounded-lg bg-card border border-border hover:bg-accent hover:border-primary/30 transition-colors text-base text-foreground leading-relaxed mb-6"
+              >
+                "Build a contact form with mock validation"
+              </button>
             </div>
           </div>
         ) : (

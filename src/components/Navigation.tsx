@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 interface NavigationProps {
 }
@@ -59,6 +60,24 @@ export default function Navigation() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <SignedIn>
+              <Link 
+                href="/dashboard"
+                className="px-3 py-1.5 text-sm rounded-md text-foreground hover:bg-accent transition-colors"
+              >
+                Dashboard
+              </Link>
+            </SignedIn>
+            <SignedOut>
+              <SignInButton>
+                <button className="px-3 py-1.5 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+                  Sign In
+                </button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
             <ThemeToggle />
           </div>
         </div>

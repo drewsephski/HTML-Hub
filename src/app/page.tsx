@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import { v4 as uuidv4 } from 'uuid';
 import AIChat from '@/components/ai/AIChat';
+import { useUser, SignInButton } from "@clerk/nextjs";
 
 // Loading skeleton component
 const SkeletonLoader = ({ className }: { className: string }) => (
@@ -11,6 +12,7 @@ const SkeletonLoader = ({ className }: { className: string }) => (
 );
 
 export default function Home() {
+  const { isSignedIn, user } = useUser();
   const [html, setHtml] = useState('');
   const [css, setCss] = useState('');
   const [js, setJs] = useState('');
@@ -168,7 +170,7 @@ export default function Home() {
   };
 
   // New function to create a new template
-  const createTemplate = () => {
+  const createTemplate = async () => {
     const newTemplate = {
       id: Date.now().toString(),
       name: title || 'Untitled Template',
@@ -182,6 +184,28 @@ export default function Home() {
     const templates = JSON.parse(localStorage.getItem('templates') || '[]');
     templates.push(newTemplate);
     localStorage.setItem('templates', JSON.stringify(templates));
+    
+    // Also save to database for gallery (even for non-signed in users)
+    try {
+      const response = await fetch('/api/tools', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          title: title || 'Untitled Template',
+          html, 
+          css, 
+          js 
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to save template to database');
+      }
+    } catch (error) {
+      console.error('Error saving template to database:', error);
+    }
     
     alert('Template saved successfully!');
   };
@@ -257,6 +281,45 @@ export default function Home() {
     setJs(extractedJS);
   };
 
+  // New function to save code to database
+  const saveCodeToDatabase = async () => {
+    if (!isSignedIn) {
+      alert('Please sign in to save your code creations');
+      return;
+    }
+
+    if (!html && !css && !js) {
+      alert('Please add some code before saving');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/tools', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          title: title || 'Untitled Creation',
+          html, 
+          css, 
+          js 
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save code');
+      }
+
+      const tool = await response.json();
+      alert('Code saved successfully!');
+      return tool;
+    } catch (error) {
+      console.error('Error saving code:', error);
+      alert('Failed to save code. Please try again.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background bg-pattern p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
@@ -290,9 +353,23 @@ export default function Home() {
             >
               Format Code
             </button>
+            {isSignedIn ? (
+              <button
+                onClick={saveCodeToDatabase}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover-lift btn-enhanced shadow-md font-medium"
+              >
+                Save to Account
+              </button>
+            ) : (
+              <SignInButton>
+                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover-lift btn-enhanced shadow-md font-medium">
+                  Sign In to Save
+                </button>
+              </SignInButton>
+            )}
             <button
               onClick={createTemplate}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover-lift btn-enhanced shadow-md font-medium"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover-lift btn-enhanced shadow-md font-medium"
             >
               Save Template
             </button>

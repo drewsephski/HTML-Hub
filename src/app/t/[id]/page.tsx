@@ -11,6 +11,7 @@ import { useParams } from 'next/navigation';
   css: string;
   js: string;
   createdAt: string;
+  updatedAt: string;
  }
 
 export default function ToolPage() {
@@ -39,6 +40,7 @@ export default function ToolPage() {
         }
         
         const data = await response.json();
+        // The API returns { tool }, not tool directly
         setTool(data.tool);
         
         setSrcDoc(`
